@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  win360 :
+  win240 :
     runs-on: windows-latest
     timeout-minutes: 360
 
@@ -72,9 +72,9 @@ jobs:
       
       - name: 》 Koneksi Maintain ...
         run: |
-          Write-Host "T E R S I A P K A N"
-          Write-Host "IP : $env:TAILSCALE_IP"
-          Write-Host "6Jam / 360 Menit:"
+          Write-Host "..."
+          Write-Host "IP Address: $env:TAILSCALE_IP"
+          Write-Host "Login:"
           Write-Host "$(echo $env:RDP_CREDS)"
           Write-Host ">> BISMILLAH <<"
           
