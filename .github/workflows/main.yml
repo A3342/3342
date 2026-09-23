@@ -1,15 +1,15 @@
-name: A33
+name: WAL 360
 
 on:
   workflow_dispatch:
 
 jobs:
-  rdp:
+  win360 :
     runs-on: windows-latest
     timeout-minutes: 360
 
     steps:
-      - name: 》Menyiapkan Konfigurasi Core RDP ...
+      - name: 》Siapkan 360 Menit Core RDP ...
         run: |
           # Enable Remote Desktop and disable Network Level Authentication (if needed)
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' `
@@ -26,33 +26,23 @@ jobs:
             dir=in action=allow protocol=TCP localport=3389
           # (Optional) Restart the Remote Desktop service to ensure changes take effect
           Restart-Service -Name TermService -Force
-      - name: 》 Menyiapkan ID & Pass ...
+      - name: 》 Siapkan User & Password ....
         run: |
-          Add-Type -AssemblyName System.Security
-          $charSet = @{
-              Upper   = [char[]](65)  # A
-              Lower   = [char[]](97)  # a
-              Number  = [char[]](50)  # 2
-              Special = @('@')        # @
-          }
-          $rawPassword = @()
-          $rawPassword += $charSet.Upper | Get-Random -Count 4
-          $rawPassword += $charSet.Lower | Get-Random -Count 4
-          $rawPassword += $charSet.Number | Get-Random -Count 4
-          $rawPassword += $charSet.Special | Get-Random -Count 4
-          $password = -join ($rawPassword | Sort-Object { Get-Random })
+          $password = "a2@"
           $securePass = ConvertTo-SecureString $password -AsPlainText -Force
-          New-LocalUser -Name "a33a" -Password $securePass -AccountNeverExpires
-          Add-LocalGroupMember -Group "Administrators" -Member "a33a"
-          Add-LocalGroupMember -Group "Remote Desktop Users" -Member "a33a"
+          if (-not (Get-LocalUser -Name "wal" -ErrorAction SilentlyContinue)) {
+              New-LocalUser -Name "wal" -Password $securePass -AccountNeverExpires
+          }
+          Add-LocalGroupMember -Group "Administrators" -Member "wal" -ErrorAction SilentlyContinue
+          Add-LocalGroupMember -Group "Remote Desktop Users" -Member "wal" -ErrorAction SilentlyContinue
           
-          echo "RDP_CREDS=USER: a33a | PASS: $Password" >> $env:GITHUB_ENV
+          echo "RDP_CREDS=User: wal | Pass: $Password" >> $env:GITHUB_ENV
           
-          if (-not (Get-LocalUser -Name "a33a")) {
+          if (-not (Get-LocalUser -Name "wal")) {
               Write-Error "User creation failed"
               exit 1
           }
-      - name: 》Memasang Tailscale ...
+      - name: 》Inisiasi Tailscale ...
         run: |
           $tsUrl = "https://pkgs.tailscale.com/stable/tailscale-setup-1.82.0-amd64.msi"
           $installerPath = "$env:TEMP\tailscale.msi"
@@ -62,7 +52,7 @@ jobs:
           Remove-Item $installerPath -Force
       - name: 》 Establish Koneksi Tailscale ...
         run: |
-          # Siapkan AuthKey & HostName Unik ...
+          # Siapkan AuthKey IP Address ...
           & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTH_KEY }} --hostname=gh-runner-$env:GITHUB_RUN_ID
           
           # Wait for Tailscale to assign an IP
@@ -82,14 +72,14 @@ jobs:
       
       - name: 》 Koneksi Maintain ...
         run: |
-          Write-Host "Tunggu ..."
-          Write-Host "IP Address: $env:TAILSCALE_IP"
-          Write-Host "Login:"
+          Write-Host "T E R S I A P K A N"
+          Write-Host "IP : $env:TAILSCALE_IP"
+          Write-Host "6Jam / 360 Menit:"
           Write-Host "$(echo $env:RDP_CREDS)"
           Write-Host ">> BISMILLAH <<"
           
           # Keep runner active indefinitely (or until manually cancelled)
           while ($true) {
-              Write-Host "[$(Get-Date)] RDP Dimulai.. Ctrl+C Cancel Workflow"
+              Write-Host "[$(Get-Date)] Berjalan.. Ctrl+C Cancel Workflow"
               Start-Sleep -Seconds 9000
           }
